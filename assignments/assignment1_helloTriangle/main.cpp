@@ -8,12 +8,13 @@
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
-float vertices[9] = {
-	//x		//y		//z
-	-0.5,	-0.5,	0.0, //Bottom left
-	0.5,	-0.5,	0.0, //Bottom right
-	0.0,	0.5,	0.0  //Top center
+float vertices[21] = {
+	//x		//y		//z		//r		//g		//b		//a
+	-0.5,	-0.5,	0.0,	1.0,	0.0,	0.0,	1.0, //Bottom left
+	0.5,	-0.5,	0.0,	0.0,	1.0,	0.0,	1.0, //Bottom right
+	0.0,	0.5,	0.0,	0.0,	0.0,	1.0,	1.0  //Top center
 };
+const int ATTRIBS_PER_VERTEX = 7;
 unsigned int createVAO(float* vertexData, int numVertices);
 unsigned int createShader(GLenum shaderType, const char* sourceCode);
 unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
@@ -46,7 +47,10 @@ int main() {
 	const char* vertexShaderSource = R"(
 		#version 450
 		layout(location = 0) in vec3 vPos;
+		layout(location = 1) in vec4 vColor;
+		out vec4 Color;
 		void main(){
+			Color = vColor;
 			gl_Position = vec4(vPos,1.0);
 		}
 	)";
@@ -54,15 +58,22 @@ int main() {
 	const char* fragmentShaderSource = R"(
 		#version 450
 		out vec4 FragColor;
+		in vec4 Color;
+		uniform float Time = 2.0;
 		void main(){
-			FragColor = vec4(1.0);
+			FragColor = Color;
 		}
 	)";
 
 	unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
-	//main loop
+	//render loop
 	while (!glfwWindowShouldClose(window)) {
+		float time = (float)glfwGetTime();//the current time in seconds this frame
+		int timeLocation = glGetUniformLocation(shaderProgram, "_Time"); //get the location of the uniform by name
+		glUniform1f(timeLocation, time);//Set the value of the variable at the location
+
+
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -79,21 +90,27 @@ int main() {
 
 unsigned int createVAO(float* vertexData, int numVertices)
 {
+
+	unsigned int vao;
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
 	//Define a new buffer ID
 	unsigned int vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//allocate space for + send vertex data to GPU
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ATTRIBS_PER_VERTEX * numVertices, vertexData, GL_STATIC_DRAW);
 
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	//tell vao to pull vertex data from vbo
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 	//Define position attribute (3 floats)
-	glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * ATTRIBS_PER_VERTEX, (const void*)0);
 	glEnableVertexAttribArray(0);
+	//define color attribute (4 floats)
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * ATTRIBS_PER_VERTEX, (const void*)(sizeof(float) * 3));
+	glEnableVertexAttribArray(1);
+
 	return vao;
 }
 
@@ -103,14 +120,14 @@ unsigned int createShader(GLenum shaderType, const char* sourceCode)
 	//create a new vertex shader object
 	unsigned int shader = glCreateShader(shaderType);
 	//supply the shader object with source code
-	glShaderSource(shaderType, 1, &sourceCode, NULL);
+	glShaderSource(shader, 1, &sourceCode, NULL);
 	//compile the shader object
-	glCompileShader(shaderType);
+	glCompileShader(shader);
 	int success;
-	glGetShaderiv(shaderType, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(shaderType, 512, NULL, infoLog);
+		glGetShaderInfoLog(shader, 512, NULL, infoLog);
 		printf("Failed to compile shader: %s", infoLog);
 	}
 	return shader;
