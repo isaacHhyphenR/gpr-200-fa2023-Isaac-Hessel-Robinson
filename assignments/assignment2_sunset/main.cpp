@@ -43,6 +43,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 
 int main() {
+	//buncha initialization stuff
 	printf("Initializing...");
 	if (!glfwInit()) {
 		printf("GLFW failed to init!");
@@ -68,11 +69,14 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
+
+/////////////////////////////////////////////////////////////////////////Actually interesting stuff
+
 	//creates shader program
 	IHR::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	shader.use();
 
-	unsigned int vao = createVAO(vertices, 6, indices, 6);
+	unsigned int vao = createVAO(vertices, 4, indices, 6);
 	glBindVertexArray(vao);
 
 	
@@ -85,6 +89,9 @@ int main() {
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//Set uniforms
+		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
+		shader.setFloat("_Brightness", triangleBrightness);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
@@ -125,7 +132,7 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertexData, GL_STATIC_DRAW);
 
 	//Define a new buffer id
 	unsigned int ebo;
@@ -142,6 +149,11 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, u));
 	glEnableVertexAttribArray(1);
 
+	/*
+	//Color
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, r));
+	glEnableVertexAttribArray(2);
+	*/
 	return vao;
 }
 
