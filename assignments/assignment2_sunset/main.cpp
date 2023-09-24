@@ -91,7 +91,9 @@ int main() {
 
 		//Set uniforms
 		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
+		shader.setVec2("_Resolution", SCREEN_WIDTH,SCREEN_HEIGHT);
 		shader.setFloat("_Brightness", triangleBrightness);
+		shader.setFloat("_Time", (float)glfwGetTime());
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
