@@ -14,8 +14,8 @@ uniform vec3 _HillColor;
 
 
 void main(){
-    
-    float sunStartY = 0.5; //higher number makes the sun be higher up
+    float sunStartY = 0.5f; //higher makes the sun be further up
+    float sunRange = 0.5; //higher number makes the sun go further off screen
     float sunX = 0.5; //the horitzontal position of the sun
     float sunSize = 0.3;
 
@@ -33,7 +33,7 @@ void main(){
     _UV.x *= aspectRatio;
     
     //////////////////Sun
-    float sunY = sin(_Time - sunStartY) * _SunSpeed; //the minus is to start it in a better position on frame 1
+    float sunY = sin(_Time / (1- (_SunSpeed +0.1))) * sunRange;
     sunY += sunStartY;
     vec2 sunPos = vec2(sunX * aspectRatio, sunY);
     
