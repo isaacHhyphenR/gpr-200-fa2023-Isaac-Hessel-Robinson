@@ -28,6 +28,13 @@ float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
 float triangleBrightness = 1.0f;
 bool showImGUIDemoWindow = true;
 
+float _SkyColorTop[3] = { 0.9, 0.4, 0.7 };
+float _SkyColorBottom[3] = { 0.6, 0.15, 0.2 };
+float _SunRiseColor[3] = { 0.95,0.6,0.05 };
+float _SunSetColor[3] = { 1.0,0.0,0.2 };
+float _SunSpeed = 0.5;
+float _HillColor[3] = { 0.1, 0.6, 0.25 };
+
 
 Vertex vertices[4] = {
 		//x   //y   //z   //u   //v
@@ -90,10 +97,14 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Set uniforms
-		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
 		shader.setVec2("_Resolution", SCREEN_WIDTH,SCREEN_HEIGHT);
-		shader.setFloat("_Brightness", triangleBrightness);
 		shader.setFloat("_Time", (float)glfwGetTime());
+		shader.setFloat("_SunSpeed", _SunSpeed);
+		shader.setVec3("_SkyColorTop", _SkyColorTop[0], _SkyColorTop[1], _SkyColorTop[2]);
+		shader.setVec3("_SkyColorBottom", _SkyColorBottom[0], _SkyColorBottom[1], _SkyColorBottom[2]);
+		shader.setVec3("_SunRiseColor", _SunRiseColor[0], _SunRiseColor[1], _SunRiseColor[2]);
+		shader.setVec3("_SunSetColor", _SunSetColor[0], _SunSetColor[1], _SunSetColor[2]);
+		shader.setVec3("_HillColor", _HillColor[0], _HillColor[1], _HillColor[2]);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
@@ -105,8 +116,12 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
-			ImGui::ColorEdit3("Color", triangleColor);
-			ImGui::SliderFloat("Brightness", &triangleBrightness, 0.0f, 1.0f);
+			ImGui::ColorEdit3("Upper Sky Color", _SkyColorTop);
+			ImGui::ColorEdit3("Lower Sky Color", _SkyColorBottom);
+			ImGui::ColorEdit3("Risen Sun Color", _SunRiseColor);
+			ImGui::ColorEdit3("Set Sun Color", _SunSetColor);
+			ImGui::ColorEdit3("Foreground Color", _HillColor);
+			ImGui::SliderFloat("Sun Speed", &_SunSpeed, 0.0f, 1.0f);
 			ImGui::End();
 			if (showImGUIDemoWindow) {
 				ImGui::ShowDemoWindow(&showImGUIDemoWindow);
@@ -151,11 +166,6 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, u));
 	glEnableVertexAttribArray(1);
 
-	/*
-	//Color
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, r));
-	glEnableVertexAttribArray(2);
-	*/
 	return vao;
 }
 
