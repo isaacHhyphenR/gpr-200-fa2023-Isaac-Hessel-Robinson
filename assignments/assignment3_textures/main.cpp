@@ -64,6 +64,10 @@ int main() {
 
 	glBindVertexArray(quadVAO);
 
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+		
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
