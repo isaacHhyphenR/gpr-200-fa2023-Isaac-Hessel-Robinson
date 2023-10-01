@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <ew/shader.h>
+#include <IHR/texture.h>
 
 struct Vertex {
 	float x, y, z;
@@ -20,6 +21,9 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+
+const int CHARACTER_WIDTH = 128;
+const int CHARACTER_HEIGHT = 128;
 
 Vertex vertices[4] = {
 	{-1.0, -1.0, 0.0, 0.0, 0.0},
@@ -64,10 +68,11 @@ int main() {
 
 	glBindVertexArray(quadVAO);
 
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-		
+	unsigned int backgroundTexture = IHR::loadTexture("assets/backgroundTree.png");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
