@@ -71,7 +71,7 @@ int main() {
 
 	//Creates textures
 	unsigned int backgroundTexture = IHR::loadTexture("assets/backgroundTree.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	unsigned int characterTexture = IHR::loadTexture("assets/character.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	unsigned int characterTexture = IHR::loadTexture("assets/dogThing.png", GL_REPEAT, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST);
 
 
 
