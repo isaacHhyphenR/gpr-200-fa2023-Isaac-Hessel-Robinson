@@ -62,26 +62,51 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	//creates shaders
+	ew::Shader backgroundShader("assets/background.vert", "assets/background.frag");
+	ew::Shader characterShader("asets/character.vert", "assets/character.frag");
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
-	glBindVertexArray(quadVAO);
 
-	unsigned int backgroundTexture = IHR::loadTexture("assets/backgroundTree.png");
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+	//Creates textures
+	unsigned int backgroundTexture = IHR::loadTexture("assets/backgroundTree.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	unsigned int characterTexture = IHR::loadTexture("assets/character.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
+
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Set uniforms
-		shader.use();
+		////BACKGROUND SHADER
+		backgroundShader.use();
 
+		//binds texture
+		glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+		backgroundShader.setInt("_Texture", 0);
+
+		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+
+
+
+		////CHARACTER SHADER
+		characterShader.use();
+
+		//binds texture
+		glBindTexture(GL_TEXTURE_2D, characterTexture);
+		characterShader.setInt("_Texture", 0);
+
+		//draws result
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+
 
 		//Render UI
 		{

@@ -5,7 +5,7 @@
 
 
 namespace IHR {
-	unsigned int loadTexture(const char* filePath)
+	unsigned int loadTexture(const char* filePath, int WrapMode, int minificationMode, int magnificationMode)
 	{
 		//image files stop top to bottom but UVs are bottom to top
 		stbi_set_flip_vertically_on_load(true);
@@ -40,10 +40,10 @@ namespace IHR {
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data); //reserves memory and sets the data of texture
 
 		//sets wrapping & scaling settings
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, WrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, WrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minificationMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magnificationMode);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
 		
@@ -51,7 +51,6 @@ namespace IHR {
 		stbi_image_free(data);
 		return texture;
 		
-		////////////FILTERING WRAPPING
 	}
 }
 
