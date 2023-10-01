@@ -36,6 +36,13 @@ unsigned short indices[6] = {
 	2, 3, 0
 };
 
+
+float backgroundScale = 1;
+float characterScale = 1;
+float characterX = 0.5;
+float characterY = 0.5;
+
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -89,7 +96,8 @@ int main() {
 		//binds texture
 		glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 		backgroundShader.setInt("_Texture", 0);
-
+		backgroundShader.setFloat("_Scale", backgroundScale);
+			
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -102,6 +110,9 @@ int main() {
 		//binds texture
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		characterShader.setInt("_Texture", 0);
+		backgroundShader.setFloat("_Scale", characterScale);
+		backgroundShader.setFloat("_Xpos", characterX);
+		backgroundShader.setFloat("_Ypos", characterY);
 
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
@@ -114,7 +125,13 @@ int main() {
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
 
+
+
 			ImGui::Begin("Settings");
+			ImGui::SliderFloat("Background Scale", &backgroundScale, 0.1f, 10.0f);
+			ImGui::SliderFloat("Character Scale", &characterScale, 0.1f, 1.0f);
+			ImGui::SliderFloat("Character X", &characterX, 0.0f, 1.0f);
+			ImGui::SliderFloat("Character Y", &characterY, 0.0f, 1.0f);
 			ImGui::End();
 
 			ImGui::Render();
