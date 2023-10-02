@@ -71,7 +71,7 @@ int main() {
 
 	//creates shaders
 	ew::Shader backgroundShader("assets/background.vert", "assets/background.frag");
-	ew::Shader characterShader("asets/character.vert", "assets/character.frag");
+	ew::Shader characterShader("assets/character.vert", "assets/character.frag");
 
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
