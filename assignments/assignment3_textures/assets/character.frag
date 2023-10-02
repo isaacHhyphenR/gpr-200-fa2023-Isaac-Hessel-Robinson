@@ -10,14 +10,18 @@ uniform float _Ypos;
 
 void main(){
 	vec2 UV_sample = UV; //this variable is which part of the texture it actually uses
-	UV_sample /= _Scale;
 	vec2 characterPos = vec2(_Xpos,_Ypos);
-	FragColor = texture(_Texture,UV_sample); //loads in the texture
+	//Maps the screen UV to the texture UV
+	UV_sample -= characterPos;
+	UV_sample /= _Scale;
+	UV_sample += vec2(0.5,0.5);
+	//loads in the texture
+	FragColor = texture(_Texture,UV_sample);
 	//determines the distance between the current UV & the character's center
 	float xd = distance(UV.x,characterPos.x);
 	float yd = distance(UV.y,characterPos.y);
 	float d = max(xd,yd);
 	//If that distance is larger than the character size, pixels are all transparent
-	d = step(_Scale,d);
+	d = step(_Scale/2,d);
 	FragColor.a *= 1-d;
 }
