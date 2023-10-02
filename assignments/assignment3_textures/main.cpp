@@ -41,6 +41,7 @@ float backgroundScale = 1;
 float characterScale = 1;
 float characterX = 0.5;
 float characterY = 0.5;
+float characterSpeed = 0.5;
 
 
 int main() {
@@ -92,12 +93,10 @@ int main() {
 
 		////BACKGROUND SHADER
 		backgroundShader.use();
-
 		//binds texture
 		glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 		backgroundShader.setInt("_Texture", 0);
 		backgroundShader.setFloat("_Scale", backgroundScale);
-			
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -106,14 +105,14 @@ int main() {
 
 		////CHARACTER SHADER
 		characterShader.use();
-
 		//binds texture
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		characterShader.setInt("_Texture", 0);
 		characterShader.setFloat("_Scale", characterScale);
 		characterShader.setFloat("_Xpos", characterX);
 		characterShader.setFloat("_Ypos", characterY);
-
+		characterShader.setFloat("_Time", (float)glfwGetTime());
+		characterShader.setFloat("_Speed", characterSpeed);
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -132,6 +131,7 @@ int main() {
 			ImGui::SliderFloat("Character Scale", &characterScale, 0.1f, 1.0f);
 			ImGui::SliderFloat("Character X", &characterX, 0.0f, 1.0f);
 			ImGui::SliderFloat("Character Y", &characterY, 0.0f, 1.0f);
+			ImGui::SliderFloat("Character Speed", &characterSpeed, 0.0f, 1.0f);
 			ImGui::End();
 
 			ImGui::Render();
