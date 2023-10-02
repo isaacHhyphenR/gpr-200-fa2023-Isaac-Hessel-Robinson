@@ -41,7 +41,7 @@ float backgroundScale = 1;
 float characterScale = 1;
 float characterX = 0.5;
 float characterY = 0.5;
-float characterSpeed = 0.5;
+float characterSpeed = 0.0;
 
 
 int main() {

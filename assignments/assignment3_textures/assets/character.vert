@@ -21,8 +21,8 @@ void main(){
 	
 	//animates the character in a little bouncy bounce
 	vCharacterPosition = vec2(_Xpos,_Ypos);
-	vCharacterPosition.x += sin(_Time / (1 - (_Speed +0.1))) * _Scale * characterRange;
-	vCharacterPosition.y -= abs(sin(_Time / (1 - (_Speed +0.1))) * _Scale * characterRange);
+	vCharacterPosition.x += sin(_Time / (1 - _Speed + 0.01) *_Speed) * _Scale * characterRange;
+	vCharacterPosition.y -= abs(sin(_Time / (1 - _Speed + 0.01) *_Speed) * _Scale * characterRange);
 
 	characterPosition = vCharacterPosition;
 }
