@@ -110,9 +110,9 @@ int main() {
 		//binds texture
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		characterShader.setInt("_Texture", 0);
-		backgroundShader.setFloat("_Scale", characterScale);
-		backgroundShader.setFloat("_Xpos", characterX);
-		backgroundShader.setFloat("_Ypos", characterY);
+		characterShader.setFloat("_Scale", characterScale);
+		//characterShader.setFloat("_Xpos", characterX);
+		//characterShader.setFloat("_Ypos", characterY);
 
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
