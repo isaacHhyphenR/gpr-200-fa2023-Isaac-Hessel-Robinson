@@ -5,6 +5,7 @@ in vec2 characterPosition;
 
 uniform sampler2D _Texture;
 uniform float _Scale;
+uniform float _Opacity;
 
 
 void main(){
@@ -21,5 +22,5 @@ void main(){
 	float d = max(xd,yd);
 	//If that distance is larger than the character size, pixels are all transparent
 	d = step(_Scale/2,d);
-	FragColor.a *= 1-d;
+	FragColor.a *= _Opacity-d;
 }

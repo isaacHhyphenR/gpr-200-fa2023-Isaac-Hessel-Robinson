@@ -38,11 +38,12 @@ unsigned short indices[6] = {
 
 
 float backgroundScale = 1;
-float characterScale = 1;
+float characterScale = 0.5;
 float characterX = 0.5;
 float characterY = 0.5;
 float characterSpeed = 0.0;
-
+float treeOpacity = 1;
+float characterOpacity = 1;
 
 int main() {
 	printf("Initializing...");
@@ -78,7 +79,9 @@ int main() {
 
 
 	//Creates textures
-	unsigned int backgroundTexture = IHR::loadTexture("assets/backgroundTree.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	unsigned int noiseTexture = IHR::loadTexture("assets/noise.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	unsigned int cloudTexture = IHR::loadTexture("assets/backgroundClouds.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	unsigned int treeTexture = IHR::loadTexture("assets/backgroundTree.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	unsigned int characterTexture = IHR::loadTexture("assets/dogThing.png", GL_REPEAT, GL_LINEAR_MIPMAP_NEAREST, GL_NEAREST);
 
 
@@ -93,10 +96,20 @@ int main() {
 
 		////BACKGROUND SHADER
 		backgroundShader.use();
-		//binds texture
-		glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-		backgroundShader.setInt("_Texture", 0);
+		//binds textures
+		glActiveTexture(GL_TEXTURE0 + 0);
+		glBindTexture(GL_TEXTURE_2D, cloudTexture);
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		glActiveTexture(GL_TEXTURE0 + 2);
+		glBindTexture(GL_TEXTURE_2D, treeTexture);
+		//sets uniforms
+		backgroundShader.setInt("_Clouds", 0);
+		backgroundShader.setInt("_Noise", 1);
+		backgroundShader.setInt("_Tree", 2);
+		backgroundShader.setFloat("_ForegroundOpacity", treeOpacity);
 		backgroundShader.setFloat("_Scale", backgroundScale);
+		backgroundShader.setFloat("_Time", (float)glfwGetTime());
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -106,13 +119,15 @@ int main() {
 		////CHARACTER SHADER
 		characterShader.use();
 		//binds texture
+		glActiveTexture(GL_TEXTURE0 + 0);
 		glBindTexture(GL_TEXTURE_2D, characterTexture);
 		characterShader.setInt("_Texture", 0);
 		characterShader.setFloat("_Scale", characterScale);
 		characterShader.setFloat("_Xpos", characterX);
 		characterShader.setFloat("_Ypos", characterY);
 		characterShader.setFloat("_Time", (float)glfwGetTime());
-		characterShader.setFloat("_Speed", characterSpeed);
+		characterShader.setFloat("_Speed", characterSpeed); 
+		characterShader.setFloat("_Opacity", characterOpacity);
 		//draws result
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -128,11 +143,13 @@ int main() {
 
 			ImGui::Begin("Settings");
 			ImGui::SliderFloat("Background Scale", &backgroundScale, 0.1f, 10.0f);
-			ImGui::SliderFloat("Character Scale", &characterScale, 0.1f, 1.0f);
-			ImGui::SliderFloat("Character X", &characterX, 0.0f, 1.0f);
-			ImGui::SliderFloat("Character Y", &characterY, 0.0f, 1.0f);
-			ImGui::SliderFloat("Character Speed", &characterSpeed, 0.0f, 1.0f);
-			ImGui::End();
+			ImGui::SliderFloat("Dog Scale", &characterScale, 0.1f, 1.0f);
+			ImGui::SliderFloat("Dog X", &characterX, 0.0f, 1.0f);
+			ImGui::SliderFloat("Dog Y", &characterY, 0.0f, 1.0f);
+			ImGui::SliderFloat("Dog Speed", &characterSpeed, 0.0f, 1.0f);
+			ImGui::SliderFloat("Tree Opacity", &treeOpacity, 0.0f, 1.0f);
+			ImGui::SliderFloat("Dog Opacity", &characterOpacity, 0.0f, 1.0f);
+			ImGui::End(); 
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
