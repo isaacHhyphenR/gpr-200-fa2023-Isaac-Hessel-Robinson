@@ -8,7 +8,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <ew/shader.h>
+#include <IHR/shader.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
 
@@ -51,7 +51,7 @@ int main() {
 	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	IHR::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
@@ -64,7 +64,8 @@ int main() {
 
 		//Set uniforms
 		shader.use();
-
+		//recreate model matrix every frame to automatically update as vectors change
+		//shader.setMat4("_Model", transform.getModelMatrix());
 		//TODO: Set model matrix uniform
 
 		cubeMesh.draw();

@@ -15,7 +15,7 @@ set(CORE_INC_DIR
  CACHE PATH "CORE INCLUDE SOURCE PATH"
 )
 
-add_library(core STATIC ${CORE_SRC} ${CORE_INC} "IHR/texture.h" "IHR/texture.cpp")
+add_library(core STATIC ${CORE_SRC} ${CORE_INC} "IHR/texture.h" "IHR/texture.cpp" "IHR/transformations.h")
 
 find_package(OpenGL REQUIRED)
 

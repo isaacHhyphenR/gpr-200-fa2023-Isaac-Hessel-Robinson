@@ -70,6 +70,12 @@ namespace IHR {
 		glUseProgram(m_id);
 	}
 
+	void Shader::setMat4(const std::string& name, const ew::Mat4& v) const
+	{
+		//location- the uniform location;  couunt- the number of 4x4 matrices;  transpose- whether to transpose the matrix;  value-the address of the first element in the matrx;
+		glUniformMatrix4fv(glGetUniformLocation(m_id, name.c_str()), 1, GL_FALSE, &v[0][0]);
+	}
+
 	//setters
 	void Shader::setInt(const std::string & name, int v) const
 	{
