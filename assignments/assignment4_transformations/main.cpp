@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <IHR/shader.h>
+#include <IHR/transformations.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
 
@@ -17,6 +18,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 //Square aspect ratio for now. We will account for this with projection later.
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
+
+IHR::Transform cubeTransform;
 
 int main() {
 	printf("Initializing...");
@@ -65,7 +68,7 @@ int main() {
 		//Set uniforms
 		shader.use();
 		//recreate model matrix every frame to automatically update as vectors change
-		//shader.setMat4("_Model", transform.getModelMatrix());
+		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		//TODO: Set model matrix uniform
 
 		cubeMesh.draw();
@@ -77,6 +80,9 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Transform");
+			ImGui::DragFloat3("Position", &cubeTransform.position.x);
+			ImGui::DragFloat3("Rotation", &cubeTransform.rotation.x);
+			ImGui::DragFloat3("Scale", &cubeTransform.scale.x);
 			ImGui::End();
 
 			ImGui::Render();
