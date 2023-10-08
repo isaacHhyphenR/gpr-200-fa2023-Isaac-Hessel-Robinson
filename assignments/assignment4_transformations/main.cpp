@@ -103,12 +103,6 @@ int main() {
 				}
 				ImGui::PopID();
 			}
-
-			/*
-			ImGui::DragFloat3("Position", &cubeTransforms.position.x, 0.05f);
-			ImGui::DragFloat3("Rotation", &cubeTransforms.rotation.x, 1.0f);
-			ImGui::DragFloat3("Scale", &cubeTransforms.scale.x, 0.05f);
-			*/
 			ImGui::End();
 
 			ImGui::Render();

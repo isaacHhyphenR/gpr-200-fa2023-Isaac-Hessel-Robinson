@@ -40,7 +40,7 @@ namespace IHR
 	inline ew::Mat4 RotateY(float radians)
 	{
 		return ew::Mat4{
-			cos(radians), sin(radians),  0,  0,
+			cos(radians),  0, sin(radians), 0,
 			0,  1, 0,  0,
 			-sin(radians), 0, cos(radians), 0,
 			0,  0,  0,  1
