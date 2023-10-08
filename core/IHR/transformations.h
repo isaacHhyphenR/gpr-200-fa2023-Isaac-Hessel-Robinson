@@ -76,6 +76,12 @@ namespace IHR
 		{
 			return Translate(position) * RotateY(rotation.y) * RotateX(rotation.x) * RotateZ(rotation.z) * Scale(scale);
 		}
+		explicit Transform(ew::Vec3 _position = ew::Vec3(0, 0, 0), ew::Vec3 _rotation = ew::Vec3(0, 0, 0), ew::Vec3 _scale = ew::Vec3(1, 1, 1))
+		{
+			position = _position;
+			rotation = _rotation;
+			scale = _scale;
+		}
 	};
 
 }

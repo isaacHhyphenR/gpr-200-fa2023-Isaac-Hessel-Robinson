@@ -18,8 +18,16 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 //Square aspect ratio for now. We will account for this with projection later.
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
+int NUM_CUBES = 4;
 
-IHR::Transform cubeTransforms[4] = { IHR::Transform(), IHR::Transform(), IHR::Transform(), IHR::Transform() };
+ew::Vec3 topLeft = ew::Vec3(-0.5f, 0.5f, 0);
+ew::Vec3 topRight = ew::Vec3(0.5f, 0.5f, 0);
+ew::Vec3 bottomLeft = ew::Vec3(-0.5f, -0.5f, 0);
+ew::Vec3 bottomRight = ew::Vec3(0.5f, -0.5f, 0);
+ew::Vec3 startRotation = ew::Vec3(0, 0, 0);
+ew::Vec3 startScale = ew::Vec3(1, 1, 1);
+
+IHR::Transform cubeTransforms[4] = { IHR::Transform(topLeft, startRotation, startScale), IHR::Transform(topRight, startRotation, startScale), IHR::Transform(bottomLeft, startRotation, startScale), IHR::Transform(bottomRight, startRotation, startScale) };
 
 int main() {
 	printf("Initializing...");
@@ -68,9 +76,14 @@ int main() {
 		//Set uniforms
 		shader.use();
 		//recreate model matrix every frame to automatically update as vectors change
+		//Draws each cube
 		shader.setMat4("_Model", cubeTransforms[0].getModelMatrix());
-		//TODO: Set model matrix uniform
-
+		cubeMesh.draw();
+		shader.setMat4("_Model", cubeTransforms[1].getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", cubeTransforms[2].getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", cubeTransforms[3].getModelMatrix());
 		cubeMesh.draw();
 
 		//Render UI
@@ -91,9 +104,11 @@ int main() {
 				ImGui::PopID();
 			}
 
+			/*
 			ImGui::DragFloat3("Position", &cubeTransforms.position.x, 0.05f);
 			ImGui::DragFloat3("Rotation", &cubeTransforms.rotation.x, 1.0f);
 			ImGui::DragFloat3("Scale", &cubeTransforms.scale.x, 0.05f);
+			*/
 			ImGui::End();
 
 			ImGui::Render();
