@@ -11,6 +11,7 @@
 #include <IHR/shader.h>
 #include <ew/procGen.h>
 #include <IHR/transformations.h>
+#include <IHR/camera.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -20,6 +21,9 @@ const int SCREEN_HEIGHT = 720;
 
 const int NUM_CUBES = 4;
 IHR::Transform cubeTransforms[NUM_CUBES];
+
+IHR::Camera mainCamera;
+
 
 int main() {
 	printf("Initializing...");
@@ -66,6 +70,15 @@ int main() {
 		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
 	}
 
+	///CAMERA
+	mainCamera.position = (0, 0, 5);
+	mainCamera.target = (0, 0, 0);
+	mainCamera.fov = 60;
+	mainCamera.orthoSize = 6;
+	mainCamera.nearPlane = 0.1;
+	mainCamera.farPlane = 100;
+
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -80,6 +93,7 @@ int main() {
 		{
 			//Construct model matrix
 			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
+			shader.setMat4("_ViewProjection", mainCamera.ProjectionMatrix() * mainCamera.ViewMatrix());
 			cubeMesh.draw();
 		}
 
@@ -102,6 +116,7 @@ int main() {
 				ImGui::PopID();
 			}
 			ImGui::Text("Camera");
+			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
 			ImGui::End();
 			
 			ImGui::Render();
