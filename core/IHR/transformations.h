@@ -130,11 +130,11 @@ namespace IHR
 	/// <param name="near"></param>
 	/// <param name="far"></param>
 	/// <returns></returns>
-	inline ew::Mat4 Perspective(float f, float a, float n, float f)
+	inline ew::Mat4 Perspective(float v, float a, float n, float f)
 	{
 		return ew::Mat4{
-			1/(tan(f/2)*a),	0,			0,				0,
-			0,				1/tan(f/2),	0,				0,
+			1/(tan(v/2)*a),	0,			0,				0,
+			0,				1/tan(v/2),	0,				0,
 			0,				0,			(n+f)/(n-f),	(2*f*n)/(n-f),
 			0,				0,			-1,				0
 		};
