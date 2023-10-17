@@ -66,17 +66,18 @@ int main() {
 	//Cube positions
 	for (size_t i = 0; i < NUM_CUBES; i++)
 	{
-		cubeTransforms[i].position.x = i % (NUM_CUBES / 2) - 0.5;
-		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
+		cubeTransforms[i].position.x = i % (NUM_CUBES / 2) - 0.5f;
+		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5f;
 	}
 
 	///CAMERA
-	mainCamera.position = (0, 0, 5);
-	mainCamera.target = (0, 0, 0);
+	mainCamera.position = (0.0f, 0.0f, 5.0f);
+	mainCamera.target = (0.0f, 0.0f, 0.0f);
+	mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 	mainCamera.fov = 60;
 	mainCamera.orthoSize = 6;
-	mainCamera.nearPlane = 0.1;
-	mainCamera.farPlane = 100;
+	mainCamera.nearPlane = 0.1f;
+	mainCamera.farPlane = 100.0f;
 
 
 	while (!glfwWindowShouldClose(window)) {
@@ -93,6 +94,8 @@ int main() {
 		{
 			//Construct model matrix
 			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
+			//convert to view & clipspace
+			//mainCamera.target = mainCamera.position + (0, 0, 1);
 			shader.setMat4("_ViewProjection", mainCamera.ProjectionMatrix() * mainCamera.ViewMatrix());
 			cubeMesh.draw();
 		}
@@ -107,7 +110,7 @@ int main() {
 			ImGui::Text("Cubes");
 			for (size_t i = 0; i < NUM_CUBES; i++)
 			{
-				ImGui::PushID(i);
+				ImGui::PushID((int)i);
 				if (ImGui::CollapsingHeader("Transform")) {
 					ImGui::DragFloat3("Position", &cubeTransforms[i].position.x, 0.05f);
 					ImGui::DragFloat3("Rotation", &cubeTransforms[i].rotation.x, 1.0f);
@@ -117,6 +120,8 @@ int main() {
 			}
 			ImGui::Text("Camera");
 			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
+			ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
+			ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();
