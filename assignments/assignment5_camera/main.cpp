@@ -8,9 +8,9 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <ew/shader.h>
+#include <IHR/shader.h>
 #include <ew/procGen.h>
-#include <ew/transform.h>
+#include <IHR/transformations.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -19,7 +19,7 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
 const int NUM_CUBES = 4;
-ew::Transform cubeTransforms[NUM_CUBES];
+IHR::Transform cubeTransforms[NUM_CUBES];
 
 int main() {
 	printf("Initializing...");
@@ -54,7 +54,7 @@ int main() {
 	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	IHR::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));

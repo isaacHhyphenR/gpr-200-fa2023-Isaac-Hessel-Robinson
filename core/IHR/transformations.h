@@ -67,6 +67,81 @@ namespace IHR
 		};
 	}
 
+
+	/// <summary>
+	/// Creates a right handed view space
+	/// </summary>
+	/// <param name="eye">: eye (camera) position</param>
+	/// <param name="target">: position to look at</param>
+	/// <param name="up">: up axis, usually(0,1,0)</param>
+	/// <returns></returns>
+	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up)
+	{
+		//Gram-Schmidts it up to calculate the vectors that make up the view space
+		ew::Vec3 cameraForward = ew::Normalize(eye - target);
+		ew::Vec3 cameraRight = ew::Normalize(ew::Cross(up, cameraForward));
+		ew::Vec3 cameraUp = ew::Normalize(ew::Cross(cameraForward, cameraRight));
+		//Creates inverse (transposed) rotation matrix, then translation matrixes it
+		ew::Mat4 rotationMatrix = {
+			cameraRight.x,	cameraRight.y,	cameraRight.z,	0,
+			cameraUp.x,		cameraUp.y,		cameraUp.z,		0,
+			cameraForward.x,cameraForward.y,cameraForward.z,0,
+			0,				0,				0,				1
+		};
+		ew::Mat4 translationMatrix = {
+			1,	0,	0,	-eye.x,
+			0,	1,	0,	-eye.y,
+			0,	0,	1,	-eye.z,
+			0,	0,	0,	1
+		};
+		return rotationMatrix * translationMatrix;
+
+	};
+	/// <summary>
+	/// Orthographic projection
+	/// </summary>
+	/// <param name="height"></param>
+	/// <param name="aspect"></param>
+	/// <param name="near"></param>
+	/// <param name="far"></param>
+	/// <returns></returns>
+	inline ew::Mat4 Orthographic(float height, float aspect, float n, float f)
+	{
+		//left right bottom top
+		float r = height * aspect / 2;
+		float l = -r;
+		float t = height / 2;
+		float b = -t;
+
+
+		return ew::Mat4{
+			2/(r-l),	0,			0,			-((r+l) / (r-l)),
+			0,			2/(t-b),	0,			-((t+b) / (t-b)),
+			0,			0,			2/(f-n),	-((f+n) / (f-n)),
+			0,			0,			0,			1
+		};
+	
+	};
+	/// <summary>
+	/// Perspective projection
+	/// </summary>
+	/// <param name="field of view">: vertical aspect ratio (radians)</param>
+	/// <param name="aspect"></param>
+	/// <param name="near"></param>
+	/// <param name="far"></param>
+	/// <returns></returns>
+	inline ew::Mat4 Perspective(float f, float a, float n, float f)
+	{
+		return ew::Mat4{
+			1/(tan(f/2)*a),	0,			0,				0,
+			0,				1/tan(f/2),	0,				0,
+			0,				0,			(n+f)/(n-f),	(2*f*n)/(n-f),
+			0,				0,			-1,				0
+		};
+	};
+
+
+
 	struct Transform
 	{
 		ew::Vec3 position = ew::Vec3(0, 0, 0);
