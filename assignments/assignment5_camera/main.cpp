@@ -71,7 +71,8 @@ int main() {
 	}
 
 	///CAMERA
-	mainCamera.position = (0.0f, 0.0f, 5.0f);
+	mainCamera.position = (0.0f, 0.0f, 0.0f);
+	mainCamera.position.z = 1.0f; //if I set the position overal it sets them all to the same as Z
 	mainCamera.target = (0.0f, 0.0f, 0.0f);
 	mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 	mainCamera.fov = 60;
