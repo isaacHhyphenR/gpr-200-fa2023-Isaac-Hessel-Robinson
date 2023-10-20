@@ -1,7 +1,9 @@
 #pragma once
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
+#include "../ew/ewMath/ewMath.h"
 #include "../IHR/transformations.h"
+
 namespace IHR {
 	struct CameraControls {
 		double prevMouseX, prevMouseY; //Mouse position from the previous frame
@@ -32,7 +34,7 @@ namespace IHR {
 			}
 			else
 			{
-				return IHR::Perspective(fov, aspectRatio, nearPlane, farPlane);
+				return IHR::Perspective(ew::Radians(fov), aspectRatio, nearPlane, farPlane);
 			}
 		}
 	};

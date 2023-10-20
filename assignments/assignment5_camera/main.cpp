@@ -75,7 +75,7 @@ int main() {
 
 	///CAMERA
 	mainCamera.position = (0.0f, 0.0f, 0.0f);
-	mainCamera.position.z = 1.0f; //if I set the position overal it sets them all to the same as Z
+	mainCamera.position.z = 5.0f; //if I set the position overal it sets them all to the same as Z
 	mainCamera.target = (0.0f, 0.0f, 0.0f);
 	mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 	mainCamera.fov = 60;
@@ -97,14 +97,13 @@ int main() {
 		//Set uniforms
 		shader.use();
 
+		//convert to view & clipspace
+		shader.setMat4("_ViewProjection", mainCamera.ProjectionMatrix() * mainCamera.ViewMatrix());
 		//TODO: Set model matrix uniform
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//Construct model matrix
 			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
-			//convert to view & clipspace
-			//mainCamera.target = mainCamera.position + (0, 0, 1);
-			shader.setMat4("_ViewProjection", mainCamera.ProjectionMatrix() * mainCamera.ViewMatrix());
 			cubeMesh.draw();
 		}
 
@@ -128,8 +127,8 @@ int main() {
 			}
 			ImGui::Text("Camera");
 			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
-			//ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
-			//ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
+			ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
+			ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();
