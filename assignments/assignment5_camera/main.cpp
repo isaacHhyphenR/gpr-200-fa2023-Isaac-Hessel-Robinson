@@ -75,7 +75,7 @@ int main() {
 
 	///CAMERA
 	mainCamera.position = (0.0f, 0.0f, 0.0f);
-	mainCamera.position.z = 5.0f; //if I set the position overal it sets them all to the same as Z
+	mainCamera.position.z = 2.0f; //if I set the position overal it sets them all to the same as Z
 	mainCamera.target = (0.0f, 0.0f, 0.0f);
 	mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 	mainCamera.fov = 60;
@@ -180,9 +180,9 @@ void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* co
 	controls->prevMouseY = mouseY;
 
 	//Construct forward vector using yaw and pitch.
-	float fYaw = ew::Radians(controls->yaw);
-	float fPitch = ew::Radians(controls->pitch);
-	ew::Vec3 forward = ew::Vec3(cos(fYaw) * cos(fPitch), sin(fPitch), sin(fYaw) * cos(fPitch));
+	float RYaw = ew::Radians(controls->yaw);
+	float RPitch = ew::Radians(controls->pitch);
+	ew::Vec3 forward = ew::Vec3(cos(RYaw) * cos(RPitch), sin(RPitch), sin(RYaw) * cos(RPitch));
 	//Sets the target to a position in front of the camera
 	camera->target = camera->position + forward;
 

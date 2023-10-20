@@ -7,7 +7,7 @@
 namespace IHR {
 	struct CameraControls {
 		double prevMouseX, prevMouseY; //Mouse position from the previous frame
-		float yaw = 0, pitch = 0; //degrees
+		float yaw = -90, pitch = 0; //degrees
 		float mouseSensitivity = 0.1f; //how fast to turn with mouse
 		bool firstMouse = true; //flag to store initial mouse position
 		float moveSpeed = 5.0f; //how fast to move with arrow keys (M/S)
