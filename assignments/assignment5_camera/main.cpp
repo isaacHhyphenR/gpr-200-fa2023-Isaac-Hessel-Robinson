@@ -12,6 +12,7 @@
 #include <ew/procGen.h>
 #include <IHR/transformations.h>
 #include <IHR/camera.h>
+#include <IHR/IHRmath.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -23,7 +24,9 @@ const int NUM_CUBES = 4;
 IHR::Transform cubeTransforms[NUM_CUBES];
 
 IHR::Camera mainCamera;
+IHR::CameraControls mainCameraControls;
 
+void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls);
 
 int main() {
 	printf("Initializing...");
@@ -80,9 +83,13 @@ int main() {
 	mainCamera.nearPlane = 0.1f;
 	mainCamera.farPlane = 100.0f;
 
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+
+		MoveCamera(window, &mainCamera, &mainCameraControls);
+
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -121,8 +128,8 @@ int main() {
 			}
 			ImGui::Text("Camera");
 			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
-			ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
-			ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
+			//ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
+			//ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();
@@ -137,5 +144,48 @@ int main() {
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+
+void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls)
+{
+	//If right mouse is not held, release cursor and return early.
+	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
+		//Release cursor
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		controls->firstMouse = true;
+		return;
+	}
+	//GLFW_CURSOR_DISABLED hides the cursor, but the position will still be changed as we move our mouse.
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//Get screen mouse position this frame
+	double mouseX, mouseY;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+
+	//If we just started right clicking, set prevMouse values to current position.
+	//This prevents a bug where the camera moves as soon as we click.
+	if (controls->firstMouse) {
+		controls->firstMouse = false;
+		controls->prevMouseX = mouseX;
+		controls->prevMouseY = mouseY;
+	}
+
+	//Add mosue delta to yaw & pitch
+	controls->yaw += (float)(mouseX - controls->prevMouseX) * controls->mouseSensitivity;
+	controls->pitch -= (float)(mouseY - controls->prevMouseY) * controls->mouseSensitivity;
+	controls->pitch = IHR::clamp(controls->pitch, -89, 89);
+
+	//Remember previous mouse position
+	controls->prevMouseX = mouseX;
+	controls->prevMouseY = mouseY;
+
+	//Construct forward vector using yaw and pitch.
+	float fYaw = ew::Radians(controls->yaw);
+	float fPitch = ew::Radians(controls->pitch);
+	ew::Vec3 forward = ew::Vec3(cos(fYaw) * cos(fPitch), sin(fPitch), sin(fYaw) * cos(fPitch));
+	//Sets the target to a position in front of the camera
+	camera->target = camera->position + forward;
+
 }
 
