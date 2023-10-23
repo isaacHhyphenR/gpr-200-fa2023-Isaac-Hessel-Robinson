@@ -28,6 +28,18 @@ IHR::CameraControls mainCameraControls;
 
 void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls, float deltaTime);
 
+const ew::Vec3 CAM_DEFAULT_POS = (0.0f, 0.0f, 0.0f);
+const float CAM_DEFAULT_Z = 2.0f; //if I set the position overal it sets them all to the same as Z
+const ew::Vec3 CAM_DEFAULT_TARGET = (0.0f, 0.0f, 0.0f);
+const float CAM_DEFAULT_FOV = 125;
+const float CAM_DEFAULT_ORTHO_SIZE = 6;
+const float CAM_DEFAULT_NEAR = 0.1f;
+const float CAM_DEFAULT_FAR = 100.0f;
+
+const float CAM_DEFAULT_SPEED = 2.0f;
+const float CAM_DEFAULT_YAW = -90;
+const float CAM_DEFAULT_PITCH = 0;
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -74,16 +86,18 @@ int main() {
 	}
 
 	///CAMERA
-	mainCamera.position = (0.0f, 0.0f, 0.0f);
-	mainCamera.position.z = 2.0f; //if I set the position overal it sets them all to the same as Z
-	mainCamera.target = (0.0f, 0.0f, 0.0f);
+	mainCamera.position = CAM_DEFAULT_POS;
+	mainCamera.position.z = CAM_DEFAULT_Z; //if I set the position overal it sets them all to the same as Z
+	mainCamera.target = CAM_DEFAULT_TARGET;
 	mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
-	mainCamera.fov = 60;
-	mainCamera.orthoSize = 6;
-	mainCamera.nearPlane = 0.1f;
-	mainCamera.farPlane = 100.0f;
+	mainCamera.fov = CAM_DEFAULT_FOV;
+	mainCamera.orthoSize = CAM_DEFAULT_ORTHO_SIZE;
+	mainCamera.nearPlane = CAM_DEFAULT_NEAR;
+	mainCamera.farPlane = CAM_DEFAULT_FAR;
 
-	mainCameraControls.moveSpeed = 1.0f;
+	mainCameraControls.moveSpeed = CAM_DEFAULT_SPEED;
+	mainCameraControls.yaw = CAM_DEFAULT_YAW;
+	mainCameraControls.pitch = CAM_DEFAULT_PITCH;
 	
 
 	float prevTime = (float)glfwGetTime(); //Timestamp of previous frame
@@ -138,7 +152,25 @@ int main() {
 			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
 			ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
 			ImGui::DragFloat3("Target", &mainCamera.target.x, 0.05f);
+			ImGui::DragFloat("Field of View", &mainCamera.fov);
+			ImGui::DragFloat("Near Plane", &mainCamera.nearPlane);
+			ImGui::DragFloat("Far Plane", &mainCamera.farPlane);
+			ImGui::Text("Camera Controls");
+			ImGui::Text("Yaw:   %i", (int)mainCameraControls.yaw);
+			ImGui::Text("Pitch: %i", (int)mainCameraControls.pitch);
 			ImGui::DragFloat("Move Speed", &mainCameraControls.moveSpeed);
+			if (ImGui::Button("Reset")) {
+				mainCamera.position = CAM_DEFAULT_POS;
+				mainCamera.position.z = CAM_DEFAULT_Z; //if I set the position overal it sets them all to the same as Z
+				mainCamera.target = CAM_DEFAULT_TARGET;
+				mainCamera.aspectRatio = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
+				mainCamera.fov = CAM_DEFAULT_FOV;
+				mainCamera.orthoSize = CAM_DEFAULT_ORTHO_SIZE;
+				mainCamera.nearPlane = CAM_DEFAULT_NEAR;
+				mainCamera.farPlane = CAM_DEFAULT_FAR;
+				mainCameraControls.yaw = CAM_DEFAULT_YAW;
+				mainCameraControls.pitch = CAM_DEFAULT_PITCH;
+			}
 			ImGui::End();
 			
 			ImGui::Render();
@@ -158,16 +190,15 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls, float deltaTime)
 {
-	bool mouseInput = true;
-	//If right mouse is not held, release cursor and return early.
+	//If right mouse is not held, release cursor
 	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
 	{
 		//Release cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		controls->firstMouse = true;
-		mouseInput = false;
 	}
-	if (mouseInput)
+	//Only do rotation stuff when you hold down the mouse
+	else
 	{
 		//GLFW_CURSOR_DISABLED hides the cursor, but the position will still be changed as we move our mouse.
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -194,9 +225,6 @@ void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* co
 		controls->prevMouseY = mouseY;
 	}
 
-
-
-
 	///////////////Construct forward vector using yaw and pitch.
 	float RYaw = ew::Radians(controls->yaw);
 	float RPitch = ew::Radians(controls->pitch);
@@ -219,7 +247,7 @@ void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* co
 	if (glfwGetKey(window, GLFW_KEY_D)) {
 		camera->position -= right * controls->moveSpeed * deltaTime;
 	}
-	if (glfwGetKey(window, GLFW_KEY_Q)) {
+	if (glfwGetKey(window, GLFW_KEY_E)) {
 		camera->position += up * controls->moveSpeed * deltaTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q)) {
