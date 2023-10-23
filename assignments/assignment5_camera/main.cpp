@@ -26,7 +26,7 @@ IHR::Transform cubeTransforms[NUM_CUBES];
 IHR::Camera mainCamera;
 IHR::CameraControls mainCameraControls;
 
-void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls);
+void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls, float deltaTime);
 
 int main() {
 	printf("Initializing...");
@@ -83,12 +83,21 @@ int main() {
 	mainCamera.nearPlane = 0.1f;
 	mainCamera.farPlane = 100.0f;
 
+	mainCameraControls.moveSpeed = 1.0f;
 	
 
+	float prevTime = (float)glfwGetTime(); //Timestamp of previous frame
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
-		MoveCamera(window, &mainCamera, &mainCameraControls);
+		//Calculate deltaTime
+		float time = (float)glfwGetTime(); //Timestamp of current frame
+		float deltaTime = time - prevTime;
+		prevTime = time;
+
+		//Pass deltaTime into moveCamera. Update this function to include a 4th parameter.
+		MoveCamera(window, &mainCamera, &mainCameraControls, deltaTime);
+
 
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
@@ -128,7 +137,8 @@ int main() {
 			ImGui::Text("Camera");
 			ImGui::Checkbox("Orthographic", &mainCamera.orthographic);
 			ImGui::DragFloat3("Position", &mainCamera.position.x, 0.05f);
-			ImGui::DragFloat3("Target", &mainCamera.target .x, 0.05f);
+			ImGui::DragFloat3("Target", &mainCamera.target.x, 0.05f);
+			ImGui::DragFloat("Move Speed", &mainCameraControls.moveSpeed);
 			ImGui::End();
 			
 			ImGui::Render();
@@ -146,45 +156,78 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 
-void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls)
+void MoveCamera(GLFWwindow* window, IHR::Camera* camera, IHR::CameraControls* controls, float deltaTime)
 {
+	bool mouseInput = true;
 	//If right mouse is not held, release cursor and return early.
-	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) {
+	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+	{
 		//Release cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		controls->firstMouse = true;
-		return;
+		mouseInput = false;
 	}
-	//GLFW_CURSOR_DISABLED hides the cursor, but the position will still be changed as we move our mouse.
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (mouseInput)
+	{
+		//GLFW_CURSOR_DISABLED hides the cursor, but the position will still be changed as we move our mouse.
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	//Get screen mouse position this frame
-	double mouseX, mouseY;
-	glfwGetCursorPos(window, &mouseX, &mouseY);
+		//Get screen mouse position this frame
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
 
-	//If we just started right clicking, set prevMouse values to current position.
-	//This prevents a bug where the camera moves as soon as we click.
-	if (controls->firstMouse) {
-		controls->firstMouse = false;
+		//If we just started right clicking, set prevMouse values to current position.
+		//This prevents a bug where the camera moves as soon as we click.
+		if (controls->firstMouse) {
+			controls->firstMouse = false;
+			controls->prevMouseX = mouseX;
+			controls->prevMouseY = mouseY;
+		}
+
+		//Add mouse delta to yaw & pitch
+		controls->yaw += (float)(mouseX - controls->prevMouseX) * controls->mouseSensitivity;
+		controls->pitch -= (float)(mouseY - controls->prevMouseY) * controls->mouseSensitivity;
+		controls->pitch = IHR::clamp(controls->pitch, -89, 89);
+
+		//Remember previous mouse position
 		controls->prevMouseX = mouseX;
 		controls->prevMouseY = mouseY;
 	}
 
-	//Add mosue delta to yaw & pitch
-	controls->yaw += (float)(mouseX - controls->prevMouseX) * controls->mouseSensitivity;
-	controls->pitch -= (float)(mouseY - controls->prevMouseY) * controls->mouseSensitivity;
-	controls->pitch = IHR::clamp(controls->pitch, -89, 89);
 
-	//Remember previous mouse position
-	controls->prevMouseX = mouseX;
-	controls->prevMouseY = mouseY;
 
-	//Construct forward vector using yaw and pitch.
+
+	///////////////Construct forward vector using yaw and pitch.
 	float RYaw = ew::Radians(controls->yaw);
 	float RPitch = ew::Radians(controls->pitch);
 	ew::Vec3 forward = ew::Vec3(cos(RYaw) * cos(RPitch), sin(RPitch), sin(RYaw) * cos(RPitch));
-	//Sets the target to a position in front of the camera
-	camera->target = camera->position + forward;
 
+	///////////////MOVEMENT
+	//Gram-Schmidts it up to calculate the vectors that make up the view space
+	ew::Vec3 right = ew::Normalize(ew::Cross(ew::Vec3(0, 1, 0), forward));
+	ew::Vec3 up = ew::Normalize(ew::Cross(forward, right));
+	//Keyboard controls for moving along forward, back, right, left, up, and down.
+	if (glfwGetKey(window, GLFW_KEY_W)) {
+		camera->position += forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S)) {
+		camera->position -= forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A)) {
+		camera->position += right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D)) {
+		camera->position -= right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q)) {
+		camera->position += up * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q)) {
+		camera->position -= up * controls->moveSpeed * deltaTime;
+	}
+
+
+	///////////////Sets the target to a position in front of the camera
+	camera->target = camera->position + forward;
 }
 
