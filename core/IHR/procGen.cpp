@@ -14,8 +14,8 @@ namespace IHR {
 		float bottomY = -topY;
 		float thetaStep = 2 * ew::PI / numSegments;
 
-		//top segments + center * bottom
-		float numVertices = (numSegments + 1) * 2;
+		//ring segments * 2 pairs + center * top&bottom
+		float numVertices = (numSegments * 2 + 1) * 2;
 
 		////VERTICES
 		////Top Center Vertex
@@ -24,31 +24,34 @@ namespace IHR {
 		mesh.vertices.push_back(topCenter);
 
 		////Top Ring Vertices
-		//The first vertex in this ring
-		int center = 0;
-		int start = center + 1;
-		for (int i = 0; i <= numSegments; i++)
+		//Adds two copies: one for vertical facing normals & one for horizontal facing
+		for (int j = 0; j < 2; j++)
 		{
-			ew::Vertex vertex;
-			float theta = i * thetaStep;
-			vertex.pos.x = cos(theta) * radius;
-			vertex.pos.z = sin(theta) * radius;
-			vertex.pos.y = topY;
-			mesh.vertices.push_back(vertex);
+			for (int i = 0; i <= numSegments; i++)
+			{
+				ew::Vertex vertex;
+				float theta = i * thetaStep;
+				vertex.pos.x = cos(theta) * radius;
+				vertex.pos.z = sin(theta) * radius;
+				vertex.pos.y = topY;
+				mesh.vertices.push_back(vertex);
+			}
 		}
 
 
 		////Bottom Ring Vertices
-		center = numVertices - numSegments;
-		start = center + 1;
-		for (int i = 0; i <= numSegments; i++)
+		//Adds two copies: one for vertical facing normals & one for horizontal facing
+		for (int j = 0; j < 2; j++)
 		{
-			ew::Vertex vertex;
-			float theta = i * thetaStep;
-			vertex.pos.x = cos(theta) * radius;
-			vertex.pos.z = sin(theta) * radius;
-			vertex.pos.y = bottomY;
-			mesh.vertices.push_back(vertex);
+			for (int i = 0; i <= numSegments; i++)
+			{
+				ew::Vertex vertex;
+				float theta = i * thetaStep;
+				vertex.pos.x = cos(theta) * radius;
+				vertex.pos.z = sin(theta) * radius;
+				vertex.pos.y = bottomY;
+				mesh.vertices.push_back(vertex);
+			}
 		}
 		////Bottom Center Vertex
 		ew::Vertex bottomCenter;
@@ -58,9 +61,8 @@ namespace IHR {
 
 		////INDICES
 		//Top Ring Indices
-		center = 0;
-		start = center + 1;
-		int sideStart = start;
+		int center = 0;
+		int start = center + 1;
 		for (int i = 0; i < numSegments; i++)
 		{
 			mesh.indices.push_back(start + i);
@@ -69,7 +71,7 @@ namespace IHR {
 		}
 		//Bottom Ring Indices
 		center = mesh.vertices.size() - 1;
-		start = numVertices - numSegments;
+		start = numVertices - (numSegments * 2);
 		for (int i = 0; i < numSegments; i++)
 		{
 			mesh.indices.push_back(start + i);
@@ -78,6 +80,7 @@ namespace IHR {
 		}
 		//Side Indices
 		int columns = numSegments + 1;
+		int sideStart = numSegments + 1;
 		for (int i = 0; i < columns; i++)
 		{
 			start = sideStart + i;
