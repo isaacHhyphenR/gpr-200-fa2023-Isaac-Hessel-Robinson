@@ -15,6 +15,9 @@
 #include <ew/camera.h>
 #include <ew/cameraController.h>
 
+#include <IHR/procgen.h>
+
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 
@@ -78,14 +81,35 @@ int main() {
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
+	////CUBE
 	//Create cube
 	ew::MeshData cubeMeshData = ew::createCube(0.5f);
 	ew::Mesh cubeMesh(cubeMeshData);
-
 	//Initialize transforms
 	ew::Transform cubeTransform;
 
-	resetCamera(camera,cameraController);
+
+
+	////PLANE
+	//Create mesh data 
+	ew::MeshData planeMeshData = IHR::createPlane(1.0f,1.0f,16);
+	//Create mesh renderer
+	ew::Mesh planeMesh(planeMeshData);
+	//Initialize transform
+	ew::Transform planeTransform;
+	planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
+
+	////CYLINDER
+	//Create mesh data 
+	ew::MeshData cylinderMeshData = IHR::createCylinder(1.0f, 1.0f, 16);
+	//Create mesh renderer
+	ew::Mesh cylinderMesh(cylinderMeshData);
+	//Initialize transform
+	ew::Transform cylinderTransform;
+	cylinderTransform.position = ew::Vec3(-1.0f, 0.0f, 0.0f);
+
+
+	resetCamera(camera, cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -118,8 +142,10 @@ int main() {
 		shader.setVec3("_LightDir", lightF);
 
 		//Draw cube
-		shader.setMat4("_Model", cubeTransform.getModelMatrix());
-		cubeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+		//shader.setMat4("_Model", planeTransform.getModelMatrix());
+		//planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
