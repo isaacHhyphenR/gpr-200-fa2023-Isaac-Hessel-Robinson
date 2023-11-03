@@ -18,7 +18,7 @@ namespace IHR {
 		float numVertices = (numSegments + 1) * 2;
 
 		////VERTICES
-		////Top center
+		////Top Center Vertex
 		ew::Vertex topCenter;
 		topCenter.pos.y = topY;
 		mesh.vertices.push_back(topCenter);
@@ -37,10 +37,6 @@ namespace IHR {
 			mesh.vertices.push_back(vertex);
 		}
 
-		////Bottom Center Vertices
-		ew::Vertex bottomCenter;
-		bottomCenter.pos.y = bottomY;
-		mesh.vertices.push_back(bottomCenter);
 
 		////Bottom Ring Vertices
 		center = numVertices - numSegments;
@@ -54,6 +50,10 @@ namespace IHR {
 			vertex.pos.y = bottomY;
 			mesh.vertices.push_back(vertex);
 		}
+		////Bottom Center Vertex
+		ew::Vertex bottomCenter;
+		bottomCenter.pos.y = bottomY;
+		mesh.vertices.push_back(bottomCenter);
 
 
 		////INDICES
@@ -68,8 +68,8 @@ namespace IHR {
 			mesh.indices.push_back(start + i + 1);
 		}
 		//Bottom Ring Indices
-		center = numVertices - numSegments;
-		start = center + 1;
+		center = mesh.vertices.size() - 1;
+		start = numVertices - numSegments;
 		for (int i = 0; i < numSegments; i++)
 		{
 			mesh.indices.push_back(start + i);
@@ -84,9 +84,9 @@ namespace IHR {
 			//Triangle 1
 			mesh.indices.push_back(start);
 			mesh.indices.push_back(start + 1);
-			mesh.indices.push_back(start + columns + 1);
+			mesh.indices.push_back(start + columns);
 			//Triangle 2…
-			mesh.indices.push_back(start);
+			mesh.indices.push_back(start + 1);
 			mesh.indices.push_back(start + columns);
 			mesh.indices.push_back(start + columns + 1);
 		}
