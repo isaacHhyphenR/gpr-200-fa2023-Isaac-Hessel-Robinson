@@ -34,10 +34,23 @@ namespace IHR {
 				vertex.pos.x = cos(theta) * radius;
 				vertex.pos.z = sin(theta) * radius;
 				vertex.pos.y = topY;
+				//adds different normals for the vertical & horizontal facing vertices
+				if (j == 0)
+				{
+					vertex.normal = (0.0f, 1.0f, 0.0f);
+				}
+				else
+				{
+					vertex.normal = ew::Normalize(vertex.pos - topCenter.pos);
+				}
+				//applies it
 				mesh.vertices.push_back(vertex);
 			}
 		}
 
+		////Bottom Center Vertex; calculates now but adds later
+		ew::Vertex bottomCenter;
+		bottomCenter.pos.y = bottomY;
 
 		////Bottom Ring Vertices
 		//Adds two copies: one for vertical facing normals & one for horizontal facing
@@ -50,12 +63,20 @@ namespace IHR {
 				vertex.pos.x = cos(theta) * radius;
 				vertex.pos.z = sin(theta) * radius;
 				vertex.pos.y = bottomY;
+				//adds different normals for the vertical & horizontal facing vertices
+				if (j == 0)
+				{
+					vertex.normal = ew::Normalize(vertex.pos - bottomCenter.pos);
+				}
+				else
+				{
+					vertex.normal = (0.0f, -1.0f, 0.0f);
+				}
+				//applies it
 				mesh.vertices.push_back(vertex);
 			}
 		}
-		////Bottom Center Vertex
-		ew::Vertex bottomCenter;
-		bottomCenter.pos.y = bottomY;
+		//Applies the bottom center vertex
 		mesh.vertices.push_back(bottomCenter);
 
 
@@ -71,7 +92,7 @@ namespace IHR {
 		}
 		//Bottom Ring Indices
 		center = mesh.vertices.size() - 1;
-		start = numVertices - (numSegments * 2);
+		start = center - numSegments - 1;
 		for (int i = 0; i < numSegments; i++)
 		{
 			mesh.indices.push_back(start + i);
@@ -96,6 +117,12 @@ namespace IHR {
 
 		return mesh;
 	}
+
+
+
+
+
+
 	ew::MeshData createPlane(float width, float height, int subdivisions)
 	{
 		ew::MeshData mesh;
@@ -114,7 +141,7 @@ namespace IHR {
 				vertex.pos.x = width * (c / subdivisions);
 				vertex.pos.z = -height * (r / subdivisions);
 				//normal
-				vertex.normal = (0.0f,0.5f,0.0f);
+				vertex.normal = (0.0f,1.0f,0.0f);
 
 				mesh.vertices.push_back(vertex);
 
