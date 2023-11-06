@@ -15,12 +15,13 @@ namespace IHR {
 		float thetaStep = 2 * ew::PI / numSegments;
 
 		//ring segments * 2 pairs + center * top&bottom
-		float numVertices = (numSegments * 2 + 1) * 2;
+		float numVertices = (numSegments * 2 + 1) * 2.0f;
 
 		////VERTICES
 		////Top Center Vertex
 		ew::Vertex topCenter;
 		topCenter.pos.y = topY;
+		topCenter.normal = (0.0f, 1.0f, 0.0f);
 		mesh.vertices.push_back(topCenter);
 
 		////Top Ring Vertices
@@ -29,20 +30,9 @@ namespace IHR {
 		{
 			for (int i = 0; i <= numSegments; i++)
 			{
-				ew::Vertex vertex;
 				float theta = i * thetaStep;
-				vertex.pos.x = cos(theta) * radius;
-				vertex.pos.z = sin(theta) * radius;
-				vertex.pos.y = topY;
-				//adds different normals for the vertical & horizontal facing vertices
-				if (j == 0)
-				{
-					vertex.normal = (0.0f, 1.0f, 0.0f);
-				}
-				else
-				{
-					vertex.normal = ew::Normalize(vertex.pos - topCenter.pos);
-				}
+				bool isVertical = (j == 0);
+				ew::Vertex vertex = CylinderRingVertex(theta, topCenter, radius, isVertical);
 				//applies it
 				mesh.vertices.push_back(vertex);
 			}
@@ -51,6 +41,7 @@ namespace IHR {
 		////Bottom Center Vertex; calculates now but adds later
 		ew::Vertex bottomCenter;
 		bottomCenter.pos.y = bottomY;
+		bottomCenter.normal = (0.0f, -1.0f, 0.0f);
 
 		////Bottom Ring Vertices
 		//Adds two copies: one for vertical facing normals & one for horizontal facing
@@ -58,20 +49,9 @@ namespace IHR {
 		{
 			for (int i = 0; i <= numSegments; i++)
 			{
-				ew::Vertex vertex;
 				float theta = i * thetaStep;
-				vertex.pos.x = cos(theta) * radius;
-				vertex.pos.z = sin(theta) * radius;
-				vertex.pos.y = bottomY;
-				//adds different normals for the vertical & horizontal facing vertices
-				if (j == 0)
-				{
-					vertex.normal = ew::Normalize(vertex.pos - bottomCenter.pos);
-				}
-				else
-				{
-					vertex.normal = (0.0f, -1.0f, 0.0f);
-				}
+				bool isVertical = (j != 0);
+				ew::Vertex vertex = CylinderRingVertex(theta, bottomCenter, radius, isVertical);
 				//applies it
 				mesh.vertices.push_back(vertex);
 			}
@@ -95,9 +75,9 @@ namespace IHR {
 		start = center - numSegments - 1;
 		for (int i = 0; i < numSegments; i++)
 		{
-			mesh.indices.push_back(start + i);
-			mesh.indices.push_back(center);
 			mesh.indices.push_back(start + i + 1);
+			mesh.indices.push_back(center);
+			mesh.indices.push_back(start + i);
 		}
 		//Side Indices
 		int columns = numSegments + 1;
@@ -111,14 +91,45 @@ namespace IHR {
 			mesh.indices.push_back(start + columns);
 			//Triangle 2…
 			mesh.indices.push_back(start + 1);
-			mesh.indices.push_back(start + columns);
 			mesh.indices.push_back(start + columns + 1);
+			mesh.indices.push_back(start + columns);
 		}
 
 		return mesh;
 	}
 
-
+	/// <summary>
+	/// Use to construct a vertex for the ring of a cylinder.
+	/// </summary>
+	/// <param name="theta"></param>
+	/// <param name="centerVertex"></param>
+	/// <param name="radius"></param>
+	/// <param name="vertical"></param>
+	/// <returns></returns>
+	ew::Vertex CylinderRingVertex(float theta, ew::Vertex centerVertex, float radius, bool vertical)
+	{
+		ew::Vertex vertex;
+		vertex.pos.x = cos(theta) * radius;
+		vertex.pos.z = sin(theta) * radius;
+		vertex.pos.y = centerVertex.pos.y;
+		//adds different normals/UVs for the vertical & horizontal facing vertices
+		//Vertical
+		if (vertical)
+		{
+			vertex.normal = (0.0f, -1.0f, 0.0f);
+			vertex.uv.x = vertex.pos.x / ((radius - 0.5f) * 2);
+			vertex.uv.y = vertex.pos.z / ((radius - 0.5f) * 2);
+		}
+		//Horizontal
+		else
+		{
+			vertex.normal = ew::Normalize(vertex.pos - centerVertex.pos);
+			vertex.uv.x = theta;
+			vertex.uv.y = vertex.pos.y;
+		}
+		//returns
+		return vertex;
+	}
 
 
 
