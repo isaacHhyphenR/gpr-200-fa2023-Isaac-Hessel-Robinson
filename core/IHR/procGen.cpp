@@ -2,11 +2,54 @@
 
 
 namespace IHR {
-	ew::MeshData createSphere(float radius, int numSegments)
+
+	ew::MeshData createPlane(float width, float height, int subdivisions)
 	{
 		ew::MeshData mesh;
+		int columns = subdivisions + 1;
+		//Creates all the vertexes
+		for (int r = 0; r <= subdivisions; r++)
+		{
+			for (int c = 0; c <= subdivisions; c++)
+			{
+				////VERTICES
+				ew::Vertex vertex;
+				//position
+				vertex.pos.x = width * (c / subdivisions);
+				vertex.pos.z = -height * (r / subdivisions);
+				//UV
+				vertex.uv.x = vertex.pos.x / width;
+				vertex.uv.y = vertex.pos.z / -height;
+				//normal
+				vertex.normal = ew::Vec3(0.0f, 1.0f, 0.0f);
+
+				mesh.vertices.push_back(vertex);
+
+
+			}
+		}
+		//Creates all the INDICES
+		for (int r = 0; r < subdivisions; r++)
+		{
+			for (int c = 0; c < subdivisions; c++)
+			{
+				//The index of the subdivisions bottom left corner
+				int start = r * columns + c;
+				//The bottom right triangle of this subdivision
+				mesh.indices.push_back(start);
+				mesh.indices.push_back(start + 1);
+				mesh.indices.push_back(start + columns + 1);
+				//The top left triangle of this subdivision
+				mesh.indices.push_back(start);
+				mesh.indices.push_back(start + columns + 1);
+				mesh.indices.push_back(start + columns);
+			}
+		}
 		return mesh;
 	}
+
+
+
 	ew::MeshData createCylinder(float height, float radius, int numSegments)
 	{
 		ew::MeshData mesh;
@@ -21,7 +64,7 @@ namespace IHR {
 		////Top Center Vertex
 		ew::Vertex topCenter;
 		topCenter.pos.y = topY;
-		topCenter.normal = (0.0f, 1.0f, 0.0f);
+		topCenter.normal = ew::Vec3(0.0f, 1.0f, 0.0f);
 		mesh.vertices.push_back(topCenter);
 
 		////Top Ring Vertices
@@ -41,7 +84,7 @@ namespace IHR {
 		////Bottom Center Vertex; calculates now but adds later
 		ew::Vertex bottomCenter;
 		bottomCenter.pos.y = bottomY;
-		bottomCenter.normal = (0.0f, -1.0f, 0.0f);
+		bottomCenter.normal = ew::Vec3(0.0f, -1.0f, 0.0f);
 
 		////Bottom Ring Vertices
 		//Adds two copies: one for vertical facing normals & one for horizontal facing
@@ -116,7 +159,7 @@ namespace IHR {
 		//Vertical
 		if (vertical)
 		{
-			vertex.normal = (0.0f, -1.0f, 0.0f);
+			vertex.normal = ew::Vec3(0.0f, -1.0f, 0.0f);
 			vertex.uv.x = vertex.pos.x / ((radius - 0.5f) * 2);
 			vertex.uv.y = vertex.pos.z / ((radius - 0.5f) * 2);
 		}
@@ -133,43 +176,9 @@ namespace IHR {
 
 
 
-
-	ew::MeshData createPlane(float width, float height, int subdivisions)
+	ew::MeshData createSphere(float radius, int numSegments)
 	{
 		ew::MeshData mesh;
-		int columns = subdivisions + 1;
-		//Creates all the vertexes & indices
-		for (int r = 0; r <= subdivisions; r++)
-		{
-			for (int c = 0; c <= subdivisions; c++)
-			{
-				////VERTICES
-				ew::Vertex vertex;
-				//UV
-				vertex.uv.x = (float)c / subdivisions;
-				vertex.uv.y = (float)r / subdivisions;
-				//position
-				vertex.pos.x = width * (c / subdivisions);
-				vertex.pos.z = -height * (r / subdivisions);
-				//normal
-				vertex.normal = (0.0f,1.0f,0.0f);
-
-				mesh.vertices.push_back(vertex);
-
-				////INDICES
-				//The index of the subdivisions bottom left corner
-				int start = r * columns + c;
-				//The bottom right triangle of this subdivision
-				mesh.indices.push_back(start);
-				mesh.indices.push_back(start + 1);
-				mesh.indices.push_back(start + columns + 1);
-				//The top left triangle of this subdivision
-				mesh.indices.push_back(start);
-				mesh.indices.push_back(start + columns);
-				mesh.indices.push_back(start + columns + 1);
-
-			}
-		}
 		return mesh;
 	}
 }

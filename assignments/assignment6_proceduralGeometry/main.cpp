@@ -142,8 +142,8 @@ int main() {
 		shader.setVec3("_LightDir", lightF);
 
 		//Draw cube
-		//shader.setMat4("_Model", planeTransform.getModelMatrix());
-		//planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
