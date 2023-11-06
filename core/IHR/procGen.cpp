@@ -179,6 +179,64 @@ namespace IHR {
 	ew::MeshData createSphere(float radius, int numSegments)
 	{
 		ew::MeshData mesh;
+		float thetaStep = ew::TAU / numSegments;
+		float phiStep = ew::PI / numSegments;
+		for (int r = 0; r <= numSegments; r++)
+		{
+			//First and last row converge at poles
+			float phi = r * phiStep;
+			//Duplicate column for each row
+			for (int c = 0; c <= numSegments; c++)
+			{
+				float theta = c * thetaStep;
+				ew::Vertex vertex;
+				vertex.pos.x = radius * cos(theta) * sin(phi);
+				vertex.pos.y = radius * cos(phi);
+				vertex.pos.z = radius * sin(theta) * sin(phi);
+				mesh.vertices.push_back(vertex);
+			}
+		}
+
+		//// INCIDES
+		///Top Pole Indices
+		int poleStart = 0;
+		int sideStart = numSegments + 1;
+		for (int i = 0; i < numSegments; i++)
+		{
+			mesh.indices.push_back(sideStart + i);
+			mesh.indices.push_back(poleStart + i); //Pole
+			mesh.indices.push_back(sideStart + i + 1);
+		}
+
+		///Side Indices
+		int columns = numSegments + 1;
+		//Skip top and bottom poles
+		for (int r = 1; r < numSegments - 1; r++)
+		{
+			for (int c = 0; c < numSegments; c++)
+			{
+				int start = r * columns + c;
+				//Triangle 1
+				mesh.indices.push_back(start);
+				mesh.indices.push_back(start + 1);
+				mesh.indices.push_back(start + columns);
+				//Triangle 2…
+				mesh.indices.push_back(start + 1);
+				mesh.indices.push_back(start + columns + 1);
+				mesh.indices.push_back(start + columns);
+			}
+		}
+		///Bottom Pole Indices
+		poleStart = mesh.vertices.size() - numSegments;
+		sideStart = poleStart - (numSegments + 1);
+		for (int i = 0; i < numSegments; i++)
+		{
+			mesh.indices.push_back(sideStart + i + 1);
+			mesh.indices.push_back(poleStart + i); //Pole
+			mesh.indices.push_back(sideStart + i);
+		}
+
+		//Returns
 		return mesh;
 	}
 }
