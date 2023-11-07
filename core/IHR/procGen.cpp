@@ -195,8 +195,8 @@ namespace IHR {
 				vertex.pos.y = radius * cos(phi);
 				vertex.pos.z = radius * sin(theta) * sin(phi);
 				//UV
-				vertex.uv.x = c ;
-				vertex.uv.y = -r ;
+				vertex.uv.x = (float)c / numSegments;
+				vertex.uv.y = (float)-r / numSegments;
 				//Normal
 				vertex.normal = ew::Normalize(vertex.pos - ew::Vec3(0,0,0));
 				//Apply
