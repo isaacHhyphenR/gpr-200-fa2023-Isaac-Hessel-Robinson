@@ -190,9 +190,16 @@ namespace IHR {
 			{
 				float theta = c * thetaStep;
 				ew::Vertex vertex;
+				//Position
 				vertex.pos.x = radius * cos(theta) * sin(phi);
 				vertex.pos.y = radius * cos(phi);
 				vertex.pos.z = radius * sin(theta) * sin(phi);
+				//UV
+				vertex.uv.x = c ;
+				vertex.uv.y = -r ;
+				//Normal
+				vertex.normal = ew::Normalize(vertex.pos - ew::Vec3(0,0,0));
+				//Apply
 				mesh.vertices.push_back(vertex);
 			}
 		}
@@ -228,7 +235,7 @@ namespace IHR {
 		}
 		///Bottom Pole Indices
 		poleStart = mesh.vertices.size() - numSegments;
-		sideStart = poleStart - (numSegments + 1);
+		sideStart = poleStart - (numSegments + 2);
 		for (int i = 0; i < numSegments; i++)
 		{
 			mesh.indices.push_back(sideStart + i + 1);
